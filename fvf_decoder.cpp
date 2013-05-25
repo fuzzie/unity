@@ -30,12 +30,10 @@ FVFDecoder::FVFDecoder(Audio::Mixer *mixer, Audio::Mixer::SoundType soundType) {
 	_soundType = soundType;
 
 	_fileStream = NULL;
-	_audioHandle = new Audio::SoundHandle();
 }
 
 FVFDecoder::~FVFDecoder() {
 	close();
-	delete _audioHandle;
 }
 
 bool FVFDecoder::loadStream(Common::SeekableReadStream *stream) {
@@ -83,6 +81,7 @@ bool FVFDecoder::loadStream(Common::SeekableReadStream *stream) {
 	uint32 padding = _fileStream->readUint32LE();
 	assert(padding == 0);
 
+	_curFrame = 0;
 	_frameCount = _fileStream->readUint32LE();
 
 	padding = _fileStream->readUint32LE();
@@ -133,8 +132,9 @@ bool FVFDecoder::loadStream(Common::SeekableReadStream *stream) {
 	_surface.create(_width, _height, getPixelFormat());
 
 	_audioStream = createAudioStream();
-	if (_audioStream)
-		_mixer->playStream(_soundType, _audioHandle, _audioStream);
+
+	addTrack(new FVFVideoTrack(this));
+	addTrack(new FVFAudioTrack(this));
 
 	return true;
 }
@@ -143,9 +143,6 @@ void FVFDecoder::close() {
 	if (!_fileStream) return;
 
 	delete _fileStream;
-
-	_mixer->stopHandle(*_audioHandle);
-	_audioStream = 0;
 
 	_surface.free();
 }
@@ -167,7 +164,7 @@ void FVFDecoder::readNextBlock() {
 	(void)next_block_size;
 }
 
-Graphics::Surface *FVFDecoder::decodeNextFrame() {
+Graphics::Surface *FVFDecoder::internalDecodeNextFrame() {
 	assert(_fileStream);
 
 	_curFrame++;
@@ -244,9 +241,6 @@ Graphics::Surface *FVFDecoder::decodeNextFrame() {
 
 		_audioStream->queueBuffer(audio_data, audio_length, DisposeAfterUse::YES, ::Audio::FLAG_UNSIGNED);
 	}
-
-	if (_curFrame == 1)
-		_startTime = g_system->getMillis();
 
 	assert(read_so_far == frame_length);
 

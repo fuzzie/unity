@@ -26,33 +26,50 @@
 
 namespace Unity {
 
-class FVFDecoder : public ::Video::FixedRateVideoDecoder {
+class FVFDecoder : public ::Video::VideoDecoder {
 public:
 	FVFDecoder(Audio::Mixer *mixer,
 		Audio::Mixer::SoundType soundType = Audio::Mixer::kPlainSoundType);
 	virtual ~FVFDecoder();
-
-	uint16 getWidth() const { return _width; }
-	uint16 getHeight() const { return _height; }
-
-	uint32 getFrameCount() const { return _frameCount; }
 
 	bool loadStream(Common::SeekableReadStream *stream);
 	void close();
 
 	bool isVideoLoaded() const { return _fileStream != 0; }
 
-	::Graphics::Surface *decodeNextFrame();
+	::Graphics::Surface *internalDecodeNextFrame();
 	::Graphics::PixelFormat getPixelFormat() const;
 
 protected:
-	Common::Rational getFrameRate() const { return _frameRate; }
+	class FVFVideoTrack : public FixedRateVideoTrack {
+	public:
+		FVFVideoTrack(FVFDecoder *parent) : _parent(parent) { }
+
+	protected:
+		Common::Rational getFrameRate() const { return _parent->_frameRate; }
+		uint16 getWidth() const { return _parent->_width; }
+		uint16 getHeight() const { return _parent->_height; }
+		int getCurFrame() const { return _parent->_curFrame; }
+		const ::Graphics::Surface *decodeNextFrame() { return _parent->internalDecodeNextFrame(); }
+		::Graphics::PixelFormat getPixelFormat() const { return _parent->getPixelFormat(); }
+		int getFrameCount() const { return _parent->_frameCount; }
+
+		FVFDecoder *_parent;
+	};
+
+	class FVFAudioTrack : public AudioTrack {
+	public:
+		FVFAudioTrack(FVFDecoder *parent) : _parent(parent) { }
+
+	protected:
+		virtual Audio::AudioStream *getAudioStream() const { return _parent->_audioStream; }
+		FVFDecoder *_parent;
+	};
 
 private:
 	Audio::Mixer *_mixer;
 	Audio::Mixer::SoundType _soundType;
 
-	Audio::SoundHandle *_audioHandle;
 	Audio::QueuingAudioStream *_audioStream;
 	Audio::QueuingAudioStream *createAudioStream();
 
@@ -61,6 +78,7 @@ private:
 	uint16 _bpp;
 
 	uint32 _frameCount;
+	uint32 _curFrame;
 	Common::Rational _frameRate;
 
 	Common::SeekableReadStream *_fileStream;

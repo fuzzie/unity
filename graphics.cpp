@@ -524,6 +524,8 @@ void Graphics::playMovie(Common::String filename) {
 	assert(format.bytesPerPixel != 1);
 	g_system->showMouse(false);
 
+	videoDecoder->start();
+
 	while (!g_engine->shouldQuit() && !videoDecoder->endOfVideo() && !skipVideo) {
 		if (videoDecoder->needsUpdate()) {
 			const ::Graphics::Surface *frame = videoDecoder->decodeNextFrame();
