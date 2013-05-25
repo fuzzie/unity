@@ -52,7 +52,7 @@ void TextBlock::readFrom(Common::SeekableReadStream *stream) {
 
 	// make sure it's all zeros?
 	unsigned int i = 255;
-	while (buf[i] == 0) i--;
+	while (i && buf[i] == 0) i--;
 	//assert(strlen(buf) == i + 1); XXX: work out what's going on here
 
 	stream->read(buf, 4);
