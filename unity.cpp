@@ -39,7 +39,6 @@
 #include "graphics/cursorman.h"
 #include "graphics/font.h"
 #include "common/debug-channels.h"
-#include "common/EventRecorder.h"
 
 namespace Unity {
 
