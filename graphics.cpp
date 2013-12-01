@@ -530,7 +530,7 @@ void Graphics::playMovie(Common::String filename) {
 		if (videoDecoder->needsUpdate()) {
 			const ::Graphics::Surface *frame = videoDecoder->decodeNextFrame();
 			if (frame) {
-				g_system->copyRectToScreen((byte *)frame->pixels, vidwidth*vidbpp,
+				g_system->copyRectToScreen((byte *)frame->getPixels(), vidwidth*vidbpp,
 					0, 0, vidwidth, vidheight);
 
 				g_system->updateScreen();

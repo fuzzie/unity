@@ -419,7 +419,7 @@ void FVFDecoder::decodeVideoFrame(uint16 *frame, unsigned int len) {
 	byte *source = was_front;
 	byte *source_colour = was_colour_front;
 
-	byte *target = (byte *)_surface.pixels;
+	byte *target = (byte *)_surface.getPixels();
 	unsigned int i = 0;
 	// colour is processed in 4x4 blocks
 	for (unsigned int y = 0; y < _height/4; y++) {
