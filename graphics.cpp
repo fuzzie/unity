@@ -148,7 +148,7 @@ void Graphics::setCursor(unsigned int id, bool wait) {
 
 class UnityFont : public ::Graphics::Font {
 protected:
-	byte _start, _end;
+	uint32 _start, _end;
 	uint16 _size;
 	byte _glyphPitch, _glyphHeight;
 	byte *_data, *_widths;
@@ -196,13 +196,13 @@ public:
 
 	virtual int getFontHeight() const { return _glyphHeight; }
 	virtual int getMaxCharWidth() const { return _glyphPitch; }
-	virtual int getCharWidth(byte chr) const {
+	virtual int getCharWidth(uint32 chr) const {
 		if (chr < _start || chr > _end)
 			return 0;
 		return _widths[chr - _start];
 	}
 
-	virtual void drawChar(::Graphics::Surface *dst, byte chr, int x, int y, uint32 /*color*/) const {
+	virtual void drawChar(::Graphics::Surface *dst, uint32 chr, int x, int y, uint32 /*color*/) const {
 		assert(dst->format.bytesPerPixel == 1);
 
 		if (chr < _start || chr > _end) {
@@ -530,7 +530,7 @@ void Graphics::playMovie(Common::String filename) {
 		if (videoDecoder->needsUpdate()) {
 			const ::Graphics::Surface *frame = videoDecoder->decodeNextFrame();
 			if (frame) {
-				g_system->copyRectToScreen((byte *)frame->pixels, vidwidth*vidbpp,
+				g_system->copyRectToScreen((byte *)frame->getPixels(), vidwidth*vidbpp,
 					0, 0, vidwidth, vidheight);
 
 				g_system->updateScreen();

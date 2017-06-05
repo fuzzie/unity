@@ -32,21 +32,21 @@ class UnityMetaEngine : public MetaEngine {
 	virtual GameList getSupportedGames() const {
 		GameList games;
 		const PlainGameDescriptor *g = unityGames;
-		while (g->gameid) {
+		while (g->gameId) {
 			games.push_back(*g);
 			g++;
 		}
 		return games;
 	}
 
-	virtual GameDescriptor findGame(const char *gameid) const {
+	virtual GameDescriptor findGame(const char *gameId) const {
 		const PlainGameDescriptor *g = unityGames;
-		while (g->gameid) {
-			if (0 == scumm_stricmp(gameid, g->gameid))
+		while (g->gameId) {
+			if (0 == scumm_stricmp(gameId, g->gameId))
 				break;
 			g++;
 		}
-		return GameDescriptor(g->gameid, g->description);
+		return GameDescriptor(g->gameId, g->description);
 	}
 
 	virtual GameList detectGames(const Common::FSList &fslist) const {
