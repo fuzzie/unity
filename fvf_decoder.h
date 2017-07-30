@@ -59,7 +59,7 @@ protected:
 
 	class FVFAudioTrack : public AudioTrack {
 	public:
-		FVFAudioTrack(FVFDecoder *parent) : _parent(parent) { }
+		FVFAudioTrack(FVFDecoder *parent) : AudioTrack(Audio::Mixer::kPlainSoundType), _parent(parent) { }
 
 	protected:
 		virtual Audio::AudioStream *getAudioStream() const { return _parent->_audioStream; }
